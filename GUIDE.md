@@ -1,6 +1,20 @@
 # Starter guide
 
-What the starter gives you, how to debug it, and why its versions are pinned. The [README](README.md) is yours: it holds the steps your group follows live.
+How your group gets its own copy, what the starter gives you, how to debug it, and why its versions are pinned. The [README](README.md) is yours: it holds the steps your group follows live.
+
+## Your group's repository
+
+This repository is a template on GitHub. One member of the group makes the group's own copy from it:
+
+1. On the [template's GitHub page](https://github.com/L3GJ0N/eaas_token_viewer_starter), click **Use this template**, then **Create a new repository**.
+2. Under **Owner**, choose your account. Give the repository a name, and choose **Public** or **Private**.
+3. Click **Create repository from template**.
+
+With the GitHub CLI, one command does the same and clones the new repository: `gh repo create <name> --template L3GJ0N/eaas_token_viewer_starter --private --clone`.
+
+The new repository has the starter's files in a single first commit, without the starter's history. It is your group's own, not a fork, and private if you chose so. To add the other members, open its **Settings**, click **Collaborators** in the **Access** section, then **Add people**; each of them accepts the invitation GitHub sends by e-mail. Then everyone clones the group's repository and works there, and in class your group runs it from there.
+
+Later changes to the template do not reach your repository by themselves: the two histories are unrelated, so they cannot be merged. If the course announces a fix, copy the change by hand.
 
 ## What the starter provides
 
