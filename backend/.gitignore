@@ -14,3 +14,6 @@ build/
 .env
 .env.*
 !.env.example
+
+# Model files downloaded at run time: keep them in downloads/, out of Git.
+downloads/
