@@ -67,6 +67,8 @@ const drawnFields: ReadonlySet<string> = new Set([
   'capture',
 ])
 const drawnCaptureFields: ReadonlySet<string> = new Set(['name', 'answer', 'reasoning'])
+const drawnTokenizerFields: ReadonlySet<string> = new Set(['repository', 'revision'])
+const drawnViewFields: ReadonlySet<string> = new Set(['key', 'title'])
 
 // The fields of a view-model, or of a part of it, that render() does not draw.
 function undrawn(record: object, drawn: ReadonlySet<string>): Record<string, unknown> {
@@ -110,7 +112,21 @@ function render(viewModel: ViewModel): void {
   captureMore.hidden = Object.keys(captureFields).length === 0
   captureMoreText.textContent = JSON.stringify(captureFields, null, 2)
 
+  // Further fields of the view-model, and of the two parts render() draws only
+  // in part: the tokenizer line and the view selector.
   const moreFields = undrawn(viewModel, drawnFields)
+  const tokenizerFields = tokenizer === null ? {} : undrawn(tokenizer, drawnTokenizerFields)
+  if (Object.keys(tokenizerFields).length > 0) {
+    moreFields.tokenizer = tokenizerFields
+  }
+  const viewFields = Object.fromEntries(
+    viewModel.views
+      .map((option) => [option.key, undrawn(option, drawnViewFields)] as const)
+      .filter(([, fields]) => Object.keys(fields).length > 0),
+  )
+  if (Object.keys(viewFields).length > 0) {
+    moreFields.views = viewFields
+  }
   more.hidden = Object.keys(moreFields).length === 0
   moreText.textContent = JSON.stringify(moreFields, null, 2)
 }

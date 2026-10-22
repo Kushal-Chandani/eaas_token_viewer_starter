@@ -37,7 +37,7 @@ Everything the task asks for can be done in Python, because the page shows whate
 
 - A chip shows `TokenView.text` exactly as your controller sets it. What a chip shows, for example for a character split across tokens, is decided in Python.
 - The detail panel shows every field of the selected token: a field you add to `TokenView` appears there.
-- Any further field of `ViewModel` appears as JSON under **More from the view-model**, and any further field of `CaptureView` under **Response metadata**.
+- Any further field of `ViewModel`, of `TokenizerView` or of a `ViewOption` appears as JSON under **More from the view-model**, and any further field of `CaptureView` under **Response metadata**.
 - Another token sequence, such as the answer re-tokenized, is another view: add it to `views`, and the view selector offers it.
 - **Text of this view** shows `ViewModel.text`.
 
