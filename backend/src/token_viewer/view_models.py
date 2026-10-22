@@ -60,9 +60,9 @@ class TokenView(BaseModel):
     # Yours: decide what start and end count, and say so in their docstrings
     # (README.md, section 6).
     start: int
-    """Where the token begins in the text of its view."""
+    """Start character offset in rendered view text (Python Unicode indices)."""
     end: int
-    """Where the token ends in the text of its view."""
+    """Exclusive end character offset in rendered view text."""
     special: bool
     """Whether the token is a special token."""
 
@@ -113,8 +113,7 @@ class ViewOption(BaseModel):
 class CaptureView(BaseModel):
     """A captured provider response.
 
-    A first version with the two texts only. Add the response metadata the
-    task asks for.
+    Text fields are convenient for the page; metadata preserves provider fields such as model, usage, finish reason and response ID.
     """
 
     model_config = ConfigDict(use_attribute_docstrings=True)
@@ -125,7 +124,8 @@ class CaptureView(BaseModel):
     """The answer text, or None if the response has none."""
     reasoning: str | None
     """The reasoning text, or None if the response has none."""
-    # Yours: the response metadata that "4. Captures" on the task sheet lists.
+    metadata: dict[str, object]
+    """Other response metadata, kept as supplied by the capture file."""
 
 
 class ViewModel(BaseModel):

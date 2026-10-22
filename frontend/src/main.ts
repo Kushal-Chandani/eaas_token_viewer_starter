@@ -14,6 +14,18 @@ import {
 } from './api.ts'
 import type { Message, TokenView, ViewModel } from './api.ts'
 
+// Reuse a small pastel palette so adjacent tokens are easy to distinguish.
+const tokenColors = [
+  '#dbeafe', // blue
+  '#dcfce7', // green
+  '#fef3c7', // yellow
+  '#fce7f3', // pink
+  '#ede9fe', // violet
+  '#ffedd5', // orange
+  '#cffafe', // cyan
+  '#e2e8f0', // slate
+] as const
+
 // Find an element of index.html and check its type.
 function element<T extends HTMLElement>(id: string, type: new () => T): T {
   const found = document.getElementById(id)
@@ -135,6 +147,7 @@ function chip(token: TokenView, selected: TokenView | null): HTMLSpanElement {
   const isSelected = token.index === selected?.index
   const span = document.createElement('span')
   span.className = 'chip'
+  span.style.setProperty('--token-color', tokenColors[token.index % tokenColors.length])
   span.classList.toggle('special', token.special)
   span.classList.toggle('selected', isSelected)
   span.textContent = token.text
@@ -158,6 +171,8 @@ function chip(token: TokenView, selected: TokenView | null): HTMLSpanElement {
 
 function row(token: TokenView, selected: TokenView | null): HTMLTableRowElement {
   const tr = document.createElement('tr')
+  tr.className = 'token-row'
+  tr.style.setProperty('--token-color', tokenColors[token.index % tokenColors.length])
   tr.classList.toggle('selected', token.index === selected?.index)
   const cells = [
     String(token.index),

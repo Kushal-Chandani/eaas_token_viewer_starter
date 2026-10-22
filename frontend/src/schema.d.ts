@@ -130,8 +130,7 @@ export interface components {
          * CaptureView
          * @description A captured provider response.
          *
-         *     A first version with the two texts only. Add the response metadata the
-         *     task asks for.
+         *     Text fields are convenient for the page; metadata preserves provider fields such as model, usage, finish reason and response ID.
          */
         CaptureView: {
             /**
@@ -149,6 +148,13 @@ export interface components {
              * @description The reasoning text, or None if the response has none.
              */
             reasoning: string | null;
+            /**
+             * Metadata
+             * @description Other response metadata, kept as supplied by the capture file.
+             */
+            metadata: {
+                [key: string]: unknown;
+            };
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -250,12 +256,12 @@ export interface components {
             text: string;
             /**
              * Start
-             * @description Where the token begins in the text of its view.
+             * @description Start character offset in rendered view text (Python Unicode indices).
              */
             start: number;
             /**
              * End
-             * @description Where the token ends in the text of its view.
+             * @description Exclusive end character offset in rendered view text.
              */
             end: number;
             /**

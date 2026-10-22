@@ -4,7 +4,7 @@ A token viewer for chat requests: given a model on Hugging Face and a list of ch
 
 In class, your group presents what it achieved, in 10 minutes: run it from this README, show what works, follow one click through the processes with breakpoints, and show your AI-use log. Before that, replace every _Yours_ line and every "Starter:" note.
 
-Starter: this repository is a shell that runs end to end before any token logic exists: a fake controller answers every command with made-up data. The task is on the [task sheet](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/blob/main/exercises/token_viewer/README.md) in the course repository, and its [samples](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/tree/main/exercises/token_viewer/samples) hold the course request's messages. Everything the task asks for can be done in Python: the page shows whatever the view-model carries. [GUIDE.md](GUIDE.md) says what the starter provides and what is yours, what to try first, how to debug it, and why its versions are pinned. In the code, notes that begin with `Yours:` mark where your work goes.
+This repository includes a working Hugging Face tokenizer backend and a terminal view. The fake controller remains available for route tests. The task is on the [task sheet](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/blob/main/exercises/token_viewer/README.md) in the course repository, and its [samples](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/tree/main/exercises/token_viewer/samples) hold the course request's messages. Everything the task asks for can be done in Python: the page shows whatever the view-model carries. [GUIDE.md](GUIDE.md) says what the starter provides and what is yours, what to try first, how to debug it, and why its versions are pinned. In the code, notes that begin with `Yours:` mark where your work goes.
 
 ## 1. Run everything
 
@@ -37,9 +37,9 @@ npm ci
 npm run dev
 ```
 
-Open <http://localhost:5173>. Starter: the page shows the fake controller's made-up tokens; [GUIDE.md](GUIDE.md#try-the-starter) says what to try first.
+Open <http://localhost:5173>. The page starts before a tokenizer is loaded. Enter a Hugging Face tokenizer repository and revision, then click **Load model**. The first load downloads tokenizer files.
 
-The terminal view: _yours, the command that starts it._
+Start the terminal view with `cd backend` then `uv run token-viewer`. Use `load owner/repository revision`, `messages <JSON array>`, `view chat` or `view text`, `select INDEX`, `capture PATH`, and `show`; enter `quit` to exit.
 
 The tests and checks: see [Checks](#checks).
 
@@ -55,7 +55,7 @@ flowchart LR
 
 Vite's proxy passes every request under `/api` on to uvicorn, so the page and the API share one origin and need no CORS.
 
-_Yours: complete the map and explain it._ Where do the model's files come from, and when? Where does the terminal view run? Which process holds the state, and what happens to it when uvicorn restarts? Which process does each debugger attach to?
+Tokenizer files are downloaded from Hugging Face on the first `load_model` request and cached by Hugging Face. The terminal view runs in its own Python process and has separate in-memory state. Restarting uvicorn clears the page backend's state; the tokenizer files remain in the local cache. The browser debugger attaches to the page, and the Python debugger attaches to uvicorn.
 
 ## 3. Debugging
 
@@ -63,41 +63,41 @@ Stop the back end from section 1 by closing its terminal (**Kill Terminal**) or 
 
 Starter: [GUIDE.md](GUIDE.md#debugging) shows where the first breakpoints go and what **Call Stack**, **Variables** and **Network** show there.
 
-_Yours: your breakpoints in the model, where the chat template is rendered and where the text is encoded, and what **Variables** shows there._
+Useful breakpoints: `TokenizerModel.load`, `_build_views` where the chat template is rendered, and `_encode` where text is encoded. Inspect the repository/revision, rendered text, input IDs, offsets and special-token IDs in **Variables**.
 
 If your code ever reads a key or a Hugging Face token, collapse **Variables** before you share your screen.
 
 ## 4. What works
 
-_Yours: what works, in the order of the task sheet, and the steps that show it._
+Load a tokenizer repository such as `HuggingFaceTB/SmolLM2-135M-Instruct` at `main`; edit the messages; compare **Chat, after the model's chat template** with **Message text alone**; select a token to inspect its ID, piece and character offsets; and load a provider response JSON capture to view its answer and metadata. The terminal command exercises the same operations outside the browser.
 
 ## 5. Architecture
 
 | Role | In this repository | May not |
 |---|---|---|
-| Model | _yours_ | import a view, a UI library or a web framework such as FastAPI |
-| Controller | the interface in `controller.py` and your class; `wiring.py` chooses it | render anything (HTML, terminal output) |
-| View | the page in `frontend/` with its routes in `api.py`; your terminal view | import the tokenizer libraries, contain domain logic |
+| Model | `model.py`: downloads and runs a fast Hugging Face tokenizer and renders the chat template | import a view, a UI library or a web framework such as FastAPI |
+| Controller | the interface in `controller.py`, `real_controller.py`, and `wiring.py` | render anything (HTML, terminal output) |
+| View | the page in `frontend/` with its routes in `api.py`; the terminal view | import the tokenizer libraries, contain domain logic |
 
-Starter: [GUIDE.md](GUIDE.md#the-contract) explains the contract between the view-models and the page, and the two meanings of model and view.
+[GUIDE.md](GUIDE.md#the-contract) explains the contract between the view-models and the page, and the two meanings of model and view.
 
-_Yours: your view-model, where the state lives, and the change that put the page on your controller: `wiring.py` only, with no change to the model or the controller._
+The model holds tokenizer and chat state. The controller maps commands to model operations and builds the view-model. `wiring.py` selects the same controller class for the API and terminal, each with separate process-local state.
 
 ## 6. Decisions
 
-_Yours: short records of your decisions and their reasons: which files and which revision, which libraries, and where your design departs from textbook MVC._
+Decisions: use `transformers.AutoTokenizer` and require a fast tokenizer for offsets; default the chat template to `enable_thinking=False`; count offsets as Python Unicode character indices into the exact rendered view string; keep additional capture fields as provider-supplied metadata. The model/controller split follows MVC, while the controller returns a page-shaped view-model.
 
-Starter: three questions are left open on purpose. Decide them, and record what you chose and why:
+The open design questions are resolved as follows:
 
-- **Template switches.** No command and no view-model field carries the chat template's switches, such as thinking on or off, although the course request sets one. Where do they belong?
-- **Offsets.** `TokenView.start` and `TokenView.end` do not say what they count. Which unit do you choose?
-- **Capture metadata.** A capture is the file that [capture-nvidia-response](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/tree/main/llm_inference#run-the-project) in the course repository writes. The task lists the metadata a capture should show. Which of them are the provider's statements, and which are your own local reconstruction? How do your views show the difference?
+- **Template switches:** the model uses `enable_thinking=False` for the course request.
+- **Offsets:** Python Unicode character indices into each displayed view string; `end` is exclusive.
+- **Capture metadata:** answer and reasoning are extracted for dedicated display; remaining provider fields are kept in a metadata object and shown in the page's response metadata section. The code does not reconstruct provider values.
 
 ## 7. AI use
 
-Every prompt goes into [AI_USAGE.md](AI_USAGE.md). Editor AI suggestions stay off: the workspace switches off VS Code's inline suggestions and Copilot's next edit suggestions, because they write code without a prompt that could go into the log. Chat stays available for questions and hints.
+Every prompt goes into [AI_USAGE.md](AI_USAGE.md). This implementation was generated with coding-agent assistance; review it and be ready to explain it. Editor AI suggestions stay off: the workspace switches off VS Code's inline suggestions and Copilot's next edit suggestions, because they write code without a prompt that could go into the log. Chat stays available for questions and hints.
 
-_Yours: two or three representative prompts from the log, what you learned from each, and what you decided yourselves._
+The log records the coding request and the implementation summary.
 
 ## Checks
 
@@ -137,6 +137,7 @@ The back end needs Python 3.11 or newer; uv installs Python 3.13, which `backend
 | The page says "No answer from the page's server. Is npm run dev still running?", or <http://localhost:5173> does not load | Vite is not running, and no debug configuration starts it. Start it in a terminal in `frontend` with `npm run dev`. |
 | <http://127.0.0.1:8000> answers `{"detail":"Not Found"}`, or <http://127.0.0.1:8000/docs> stays blank | Expected: no route serves `/`. The page at `/docs` loads its scripts from cdn.jsdelivr.net, so it needs the internet. |
 | A command fails with HTTP 500 | Python raised an exception: a bug. uvicorn prints the traceback in its terminal; under the debugger, that is the terminal **Python Debug Console**. |
+| Loading a tokenizer says `apply_chat_template requires jinja2 to be installed` | Run `cd backend` then `uv sync` to install the newly listed chat-template dependency, then restart uvicorn. |
 | Python breakpoints never stop, but the page works | Another back end still holds port 8000, so the debugger's uvicorn stopped at once; its terminal shows "error while attempting to bind on address". Click **Stop**, stop the other back end with Ctrl+C in its terminal or by closing that terminal (**Kill Terminal**), and start debugging again. |
 | uvicorn stops with "error while attempting to bind on address ('127.0.0.1', 8000)" | Another back end already runs on port 8000, in a terminal or under the debugger. Stop it with Ctrl+C in its terminal, by closing that terminal (**Kill Terminal**), or with **Stop** in the debug toolbar. On Windows the message goes on with "[winerror 10048]" and a text in the language of Windows. |
 | `npm run dev` stops because port 5173 is in use | Another Vite server is still running. Stop it with Ctrl+C in its terminal, or close that terminal (**Kill Terminal**). |

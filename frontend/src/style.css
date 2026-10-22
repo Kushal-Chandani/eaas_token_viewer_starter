@@ -128,8 +128,8 @@ label input {
 }
 
 .chip {
-  background: #dbe8ff;
-  border-radius: 3px;
+  background: var(--token-color, #dbe8ff);
+  border-radius: 4px;
   margin-right: 2px;
   padding: 2px 0;
   cursor: pointer;
@@ -201,8 +201,12 @@ tbody tr {
   cursor: pointer;
 }
 
-tr.selected td {
-  background: #f0eef8;
+tbody tr.token-row td {
+  background: var(--token-color);
+}
+
+tbody tr.token-row.selected td {
+  background: #c7c3ec;
 }
 
 @media (max-width: 760px) {

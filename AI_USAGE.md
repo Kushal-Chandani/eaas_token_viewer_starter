@@ -19,3 +19,5 @@ Each prompt sits between two lines of four backticks, so code blocks inside the 
 ````text
 The prompt, word for word.
 ````
+
+| 2026-10-22 | Codex | do the code | Implemented the Hugging Face tokenizer backend, controller wiring, capture parsing and terminal view. Reviewed and should understand each module before presenting. |
