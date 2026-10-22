@@ -125,7 +125,7 @@ class CaptureView(BaseModel):
     """The answer text, or None if the response has none."""
     reasoning: str | None
     """The reasoning text, or None if the response has none."""
-    # Yours: the response metadata the task sheet lists in step 4.
+    # Yours: the response metadata that "4. Captures" on the task sheet lists.
 
 
 class ViewModel(BaseModel):

@@ -11,8 +11,9 @@ from token_viewer.fake_controller import FakeController
 
 def build_controller() -> Controller:
     """Return a new controller, with its model."""
+    # Importing api.py calls this, and the route tests import api.py: keep it
+    # quick and offline. Download files when the load_model command runs, not
+    # here.
     # Yours: replace FakeController() with your own controller, built on your
-    # model, both in modules of your own in this package. Importing api.py
-    # calls this, and the route tests import api.py: keep it quick and
-    # offline, and fetch files in load_model, not here.
+    # model, both in modules of your own in this package.
     return FakeController()

@@ -1,6 +1,6 @@
 # Starter guide
 
-How your group gets its own copy, what the starter gives you, how to debug it, and why its versions are pinned. The [README](README.md) is yours: it holds the steps your group follows live.
+How your group gets its own copy, what the starter gives you and what to try first, how to debug it, and why its versions are pinned. The [README](README.md) is yours: it holds the steps your group follows live.
 
 ## Your group's repository
 
@@ -31,7 +31,7 @@ The starter runs end to end before any token logic exists. A fake controller ans
 
 Keep `fake_controller.py` when your own controller works: the route tests use it. When you add a command to `Controller` or a field to a view-model, add it to the fake too.
 
-In the code and in `backend/pyproject.toml`, a comment that begins with `Yours:` marks each place where your work goes. To list them all, select **Edit > Find in Files** (Ctrl+Shift+F, on macOS Cmd+Shift+F) and search for `Yours:`. Delete each comment once your code is there.
+In the code and in `backend/pyproject.toml`, a note that begins with `Yours:`, in a comment or a docstring, marks each place where your work goes. To list them all, select **Edit > Find in Files** (Ctrl+Shift+F, on macOS Cmd+Shift+F) and search for `Yours:`. Delete each `Yours:` note once your code is there.
 
 ### Python only
 
@@ -51,9 +51,29 @@ When your controller works, plug it in at `wiring.py`. The page, written by some
 
 `npm ci` installs exactly the versions in `package-lock.json`, as `uv sync` does with `uv.lock`. The README's troubleshooting table explains what <http://127.0.0.1:8000> and its `/docs` page show.
 
+## Try the starter
+
+Before you change anything, try the starter, with the back end and the page running as in section 1 of the README. Until `wiring.py` builds your own controller, all the data on the page comes from the fake controller in `fake_controller.py`: every token is made up.
+
+- Under the title, one line shows the model repository and its revision, `fake/example · revision fake`, and a notice says "Made-up data from the fake controller: no tokenizer has run."
+- **Token boundaries** shows the seven tokens of the chat after the made-up template, `<fake>Show me fake tokens.</fake>`, as chips; the two special tokens are outlined and bold. Click a chip: **Selected token** shows all its fields. Click **All tokens of this view** to open a table of every token, and **Text of this view** to see the text the tokens cover.
+- Under **View**, choose **Text alone** instead of **Chat, after a made-up template**: the text without the made-up template, in five tokens. Switching clears the selection.
+- Type another **Repository** and **Revision**, for example `owner/name` and `main`, and click **Load model**: only the line under the title changes.
+- In **Messages as JSON**, change `"Show me fake tokens."` to `"Hello"` and click **Set messages**: **Messages** shows the new message, and the tokens and the text stay the same.
+- Under **Capture file**, choose any JSON file, for example `frontend/package.json`, and click **Load capture**: **Provider response** shows the file's name and a made-up answer. The page sends the file's name and content; the fake ignores the content.
+- **More from the view-model** and **Response metadata**, which [Python only](#python-only) mentions, stay hidden: the fake's view-models have no further fields.
+
+<http://127.0.0.1:8000/docs> lists every route and, under **Schemas**, every class the page and the back end exchange. It loads its scripts from the internet. Send one command from there:
+
+1. Click **POST /api/selection**, then **Try it out**.
+2. In **Request body**, replace the example with `{"index": 99}` and click **Execute**. Under **Server response**, **Code** shows 400: the controller ran, the stand-in model in `fake_controller.py` refused the command, and `detail` says why.
+3. Replace the body with `{"index": "3"}` and click **Execute** again. **Code** shows 422: FastAPI refused the request before the controller ran. The request classes in `api.py` are strict: `"3"` is a string, not an int.
+
+Neither answer changed anything. Then follow one click through the processes with the debugger, as the next section shows. Your own controller and model take over in the order the [task sheet](https://github.com/L3GJ0N/engineering_agentic_ai_systems_hs_aalen/blob/main/exercises/token_viewer/README.md#what-to-deliver-in-this-order) gives: first in your terminal view, then on the page, after a change to `wiring.py` only.
+
 ## Debugging
 
-The debugger starts its own back end on port 8000, so first stop the back end from section 1 of the README: press **Ctrl+C** in its terminal (Control, also on macOS), or close that terminal with its trash-can icon, **Kill Terminal**. Vite can keep running; if it does not run, start it in a terminal in `frontend` with `npm run dev`, because no debug configuration starts it. Then select **Run and Debug**, choose **Full stack: back end + browser** and click **Start Debugging**. The page opens in VS Code's integrated browser, a tab inside VS Code; it needs neither Edge nor Chrome. **Front end: browser (Edge)** and **Front end: browser (Chrome)** open an external browser instead; start them after **Back end: uvicorn**.
+The debugger starts its own back end on port 8000, so first stop the back end from section 1 of the README: close its terminal with its trash-can icon, **Kill Terminal**, or press **Ctrl+C** in it (Control, also on macOS). Vite can keep running; if it does not run, start it in a terminal in `frontend` with `npm run dev`, because no debug configuration starts it. Then select **Run and Debug**, choose **Full stack: back end + browser** and click **Start Debugging**. The page opens in VS Code's integrated browser, a tab inside VS Code; it needs neither Edge nor Chrome. **Front end: browser (Edge)** and **Front end: browser (Chrome)** open an external browser instead; start them after **Back end: uvicorn**.
 
 - **Python breakpoints:** in the route `select` in `api.py`, in your controller's `select_token` and in your model. In the starter, use `FakeController.select_token` and `_FakeModel.select` in `fake_controller.py`. Click a chip. When the debugger stops in `_FakeModel.select`, **Call Stack** shows, innermost first, the model's `select`, the controller's lambda, `_carry_out` and `select_token`, and the route `select`; click the frame `select` of `api.py` to see `body`, the request as FastAPI parsed it, in **Variables**. The paused thread is an **AnyIO worker thread**: FastAPI runs routes written with `def` in a pool of worker threads, and the lock in `api.py` lets one command at a time reach the controller.
 - **TypeScript breakpoints:** in `main.ts`, in the function `chip`, on the line `void run(() => selectToken(token.index))` in its `click` handler, and in `api.ts` on the line `if (!response.ok)`, where `data` holds the parsed answer, the view-model. The click stops in TypeScript first, then, after **Continue**, in Python.
