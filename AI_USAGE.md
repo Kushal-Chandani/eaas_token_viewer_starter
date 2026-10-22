@@ -1,6 +1,6 @@
 # AI use log
 
-Every prompt to a coding agent or a chatbot about this project goes here. Asking for explanations, documentation or a hint is allowed; letting an agent write the solution is not.
+Every prompt to a coding agent or a chatbot about this project goes here. Asking for explanations, pointers to documentation or a hint is allowed; letting an agent write the solution is not.
 
 - Log each prompt when you send it, as one row: the date, the tool or model, the prompt as written, and what you took from the answer.
 - A short prompt goes into the table as written. For a long prompt, or one with a line break or a `|`, write "see P1" (P2, P3, ...) in the prompt column and paste the prompt word for word under [Long prompts](#long-prompts).
