@@ -3,11 +3,14 @@ name = "token-viewer"
 version = "0.1.0"
 description = "Token viewer back end: the controller, the view-models and a FastAPI layer for the page"
 requires-python = ">=3.11"
+# Yours: your model's libraries. Add each with uv add, which updates uv.lock too.
 dependencies = [
     "fastapi>=0.159.1,<0.160",
     "pydantic>=2.14.1,<3",
     "uvicorn>=0.54.0,<0.55",
 ]
+# Yours: a [project.scripts] table with the command that starts your terminal
+# view, as in token_lab/pyproject.toml in the course repository.
 
 [build-system]
 requires = ["uv_build>=0.13.4,<0.14.0"]

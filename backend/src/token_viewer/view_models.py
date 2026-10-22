@@ -57,6 +57,8 @@ class TokenView(BaseModel):
     """The vocabulary entry for this ID."""
     text: str
     """The token's text, as the views show it."""
+    # Yours: decide what start and end count, and say so in their docstrings
+    # (README.md, section 6).
     start: int
     """Where the token begins in the text of its view."""
     end: int
@@ -123,6 +125,7 @@ class CaptureView(BaseModel):
     """The answer text, or None if the response has none."""
     reasoning: str | None
     """The reasoning text, or None if the response has none."""
+    # Yours: the response metadata the task sheet lists in step 4.
 
 
 class ViewModel(BaseModel):

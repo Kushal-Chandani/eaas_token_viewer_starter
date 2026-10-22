@@ -169,6 +169,8 @@ class FakeController(Controller):
 
     def view_model(self) -> ViewModel:
         """Build the view-model from the stand-in model's state."""
+        # Yours: when you add a field to a view-model, give it a made-up value
+        # here too, or the route tests fail.
         model: _FakeModel = self._model
         tokens: list[TokenView] = [
             TokenView(

@@ -154,6 +154,9 @@ def create_app(controller: Controller) -> FastAPI:
         with one_at_a_time:
             return controller.select_token(body.index)
 
+    # Yours: for each command you add to Controller, a route like these, with
+    # a request class above.
+
     return app
 
 

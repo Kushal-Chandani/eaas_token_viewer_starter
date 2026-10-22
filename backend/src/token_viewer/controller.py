@@ -5,9 +5,9 @@ the command returns. The controller carries the command out on the model; it
 renders nothing. The FastAPI routes in api.py call these commands for the
 page, and a terminal view can call them directly.
 
-Write your controller as a subclass of Controller, as FakeController does.
-Python refuses to create it while a command is missing, and names the
-command; mypy reports it too.
+Yours: write your controller as a subclass of Controller, in a module of your
+own in this package, as FakeController does. Python refuses to create it while
+a command is missing, and names the command; mypy reports it too.
 """
 
 from abc import ABC, abstractmethod
